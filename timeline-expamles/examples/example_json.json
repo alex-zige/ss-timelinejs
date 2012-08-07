@@ -1,0 +1,25 @@
+
+{
+    "timeline":
+    {
+        "headline":"Sh*t People Say",
+        "type":"default",
+		"text":"People say stuff",
+        "date": [
+            <% loop TimePoints %>
+			{
+                "startDate":"2012,1,21",
+                "headline":"Sh*t Cyclists Say",
+                "text":"",
+                "asset":
+                {
+                    "media":"http://youtu.be/GMCkuqL9IcM",
+                    "credit":"",
+                    "caption":"Video script, production, and editing by Allen Krughoff of Hardcastle Photography"
+                }
+            },
+            <% end_loop %>
+      
+        ]
+    }
+}
