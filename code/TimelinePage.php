@@ -68,6 +68,14 @@ class TimelinePage extends Page {
 	public function genreateJSON(){
 
 
+	//get those time-ponits.
+	$dataset = $this->Timepoints();
+
+	$json_formatter = new JSONDataFormatter();
+
+	Debug::show($json_formatter->convertDataObjectSet($dataset));
+
+
 /*
 Final output that we want to have:
 
@@ -107,6 +115,33 @@ class TimelinePage_Controller extends Page_Controller{
 
 	//init function output the JS library and relevant CSS
 	public function init(){
+
+		parent::init();
+
+		self::genreateJSON();
+
+		//output required js file:
+		Requirements::combine_files('timeline.js', array(
+		// Base jquery & jquery entwine
+		THIRDPARTY_DIR . '/jquery/jquery.js',
+		// JSON library
+		THIRDPARTY_DIR . '/json-js/json2.js',
+
+		// Model
+		'mysite/javascript/thirdparty/underscore.js',
+		'mysite/javascript/thirdparty/backbone.js',
+		// Controller
+		THIRDPARTY_DIR . '/jquery-entwine/dist/jquery.entwine-dist.js',
+		// View
+		'mysite/javascript/thirdparty/showdown.js',
+
+		// Application
+		'mysite/javascript/models.js',
+		'mysite/javascript/application.js'
+		));
+
+
+
 
 
 
