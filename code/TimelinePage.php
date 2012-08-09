@@ -67,14 +67,28 @@ class TimelinePage extends Page {
 	 **/
 	public function genreateJSON(){
 
-
 	//get those time-ponits.
 	$dataset = $this->Timepoints();
 
-	$json_formatter = new JSONDataFormatter();
 
-	Debug::show($json_formatter->convertDataObjectSet($dataset));
+	$json_formatter = new TimelineJSONFormatter();
 
+
+	$date_array = $this->getTimePointsArray($dataset);
+
+
+	$timeline_json_array=array(
+
+		'timeline'=>array(
+			'headline'=>'Sh*t People Say',
+			 "type"=>"default",
+			 "text"=>"People say stuff",
+			 'date'=>$date_array 
+			)
+
+		);
+
+	Debug::Show(json_encode($timeline_json_array));
 
 /*
 Final output that we want to have:
@@ -105,10 +119,47 @@ Final output that we want to have:
 }
 */
 
+	}
 
+	public function getTimePointsArray($objectset){
+
+		//start parsing
+		if($objectset)
+
+		$timepointset = $objectset;
+
+		$date= array();
+
+		foreach ($timepointset as $timepoints) {
+
+			foreach ($timepoints as $timepoint ) {
+
+				$asset=array(
+					"media" => $timepoint->MediaUrl,
+                    "credit" => $timepoint->MediaCredit,
+                    "caption" => $timepoint->MediaCaption
+					);
+				//date need to be conver to MM,DD,YY formate "12,30,2012",
+				$timepoint=array(
+					'startDate' => $timepoint->getStartDate,
+					'headline' => $timepoint->Headline,
+					'text' => $timepoint->Text,
+					"asset"=> $asset,
+				 );
+
+				array_push($date,$timepoint);
+			}
+
+	}
+		return $date;
 
 	}
 
+	public function getAsset(){
+
+
+
+	}
 
 } 
 class TimelinePage_Controller extends Page_Controller{

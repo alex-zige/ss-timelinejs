@@ -22,7 +22,7 @@ class TimePoint extends DataObject{
 		'EndDate'=>'Date',
 		'Headline'=>'Varchar(255)',
 		'Text'=>'HTMLText',
-		'MediaUrl'=>'Varchar(255)',
+		'MediaUrl'=>'HTMLText',
 		'MediaCredit'=>'Varchar(255)',
 		'MediaCaption'=>'Varchar(255)'
 	);
@@ -36,14 +36,16 @@ class TimePoint extends DataObject{
 	//Summary fields can be used to show a quick overview of the data for a specific DataObject record. 
 	//It indicate the data column
 	public static $summary_fields = array(
-       'StartDate',
-       'Headline'
+       'Headline',
+       'StartDate'
+
      );
 	//define CMS fileds
 	public function getCMSFields() {
 
 		//defien the image uploader and extension
 		$imageField = new UploadField('MeidaImage', 'Meida Image');
+
 		$imageField->allowedExtensions = array('jpg', 'gif', 'png');
 
 		return new FieldList(
@@ -57,8 +59,8 @@ class TimePoint extends DataObject{
 			$imageField
 		);
 
-	}
 
+	}
 } 
 	
 
