@@ -71,6 +71,8 @@ class TimelinePage extends Page {
 	//get those time-ponits.
 	$dataset = $this->Timepoints();
 
+	Debug::show($dataset);
+
 	$json_formatter = new JSONDataFormatter();
 
 	Debug::show($json_formatter->convertDataObjectSet($dataset));
