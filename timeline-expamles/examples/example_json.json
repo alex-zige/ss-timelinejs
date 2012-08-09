@@ -1,25 +1,26 @@
-
 {
-    "timeline":
-    {
-        "headline":"Sh*t People Say",
-        "type":"default",
-		"text":"People say stuff",
-        "date": [
-            <% loop TimePoints %>
-			{
-                "startDate":"2012,1,21",
-                "headline":"Sh*t Cyclists Say",
-                "text":"",
-                "asset":
-                {
-                    "media":"http://youtu.be/GMCkuqL9IcM",
-                    "credit":"",
-                    "caption":"Video script, production, and editing by Allen Krughoff of Hardcastle Photography"
-                }
-            },
-            <% end_loop %>
-      
-        ]
+    "timeline": {
+        "headline": "Sh*t People Say",
+        "type": "default",
+        "text": "People say stuff",
+        "date": [{
+            "startDate": "12,30,2012",
+            "headline": "alex's test",
+            "text": "<p>this is an test!<\/p>",
+            "asset": {
+                "media": "http:\/\/youtu.be\/GMCkuqL9IcM",
+                "credit": "youtube video",
+                "caption": "alex's caption"
+            }
+        }, {
+            "startDate":"12,30,2012",
+            "headline": "another test",
+            "text": "<p>this is good!<\/p>",
+            "asset": {
+                "media": null,
+                "credit": null,
+                "caption": null
+            }
+        }]
     }
 }
