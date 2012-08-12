@@ -22,7 +22,8 @@ class TimelinePage extends Page {
 	public static $description="The Timeline Page Type allow you create different Time Point";
 
 	public static $db = array(
-		'Headline'=>'Varchar(255)'
+		'Headline'=>'Varchar(255)',
+		'Tagline'=>'Varchar(255)'
 	);
 
 	//define relationshiop with TimePoints
@@ -34,6 +35,12 @@ class TimelinePage extends Page {
 	public function getCMSFields(){
 
 		$fields = parent::getCMSFields();
+
+
+		//the Global Headline
+
+		$fields->addFieldToTab("Root.Main", new TextField('Tagline','Tagline'),'Content');
+		$fields->addFieldToTab("Root.Main", new TextField('Headline','The Timeline Headline'),'Tagline');
 
 		// define the field config 
 		$gridFieldConfig = GridFieldConfig::create()->addComponents(
@@ -70,24 +77,22 @@ class TimelinePage extends Page {
 	//get those time-ponits.
 	$dataset = $this->Timepoints();
 
-	$json_formatter = new TimelineJSONFormatter();
-
-
 	$date_array = $this->getTimePointsArray($dataset);
-
 
 	$timeline_json_array=array(
 
 		'timeline'=>array(
-			'headline'=>'Sh*t People Say',
+			'headline'=>$this->Headline,
 			 "type"=>"default",
-			 "text"=>"People say stuff",
+			 "text"=>$this->Tagline,
 			 'date'=>$date_array 
 			)
 
 		);
 
-	Debug::Show(json_encode($timeline_json_array));
+//	Debug::Show(json_encode($timeline_json_array));
+return json_encode($timeline_json_array);
+
 
 /*
 Final output that we want to have:
@@ -117,7 +122,6 @@ Final output that we want to have:
     }
 }
 */
-
 	}
 
 	public function getTimePointsArray($objectset){
@@ -138,9 +142,11 @@ Final output that we want to have:
                     "credit" => $timepoint->MediaCredit,
                     "caption" => $timepoint->MediaCaption
 					);
+
 				//date need to be conver to MM,DD,YY formate "12,30,2012",
 				$timepoint=array(
-					'startDate' => $timepoint->getStartDate,
+					'startDate' => $timepoint->getNiceDate($timepoint->StartDate),
+					'endDate' => $timepoint->getNiceDate($timepoint->EndDate),
 					'headline' => $timepoint->Headline,
 					'text' => $timepoint->Text,
 					"asset"=> $asset,
@@ -157,46 +163,68 @@ Final output that we want to have:
 	public function getAsset(){
 
 
+	}
+
+	public function getreserverString($str=null){
+
+	if(is_string($str)){
+	
+	$tmp_str = $str;
+
+	//start split 
+	//split string to array
+	$tmp_str = str_split($tmp_str);
+
+	//reverse the the array;
+	$new_array = array_reverse($tmp_str);
+
+	//glu the array into a string for outputting
+	$new_str = implode('', $new_array);
+
+	return $new_str;
 
 	}
 
+
+	}
 } 
 class TimelinePage_Controller extends Page_Controller{
+
+
+	public static $Timeline_Folder = 'ss-timeline';
 
 	//init function output the JS library and relevant CSS
 	public function init(){
 
 		parent::init();
 
-		self::genreateJSON();
+		//Debug::show('sdas');
 
-		//output required js file:
-		Requirements::combine_files('timeline.js', array(
-		// Base jquery & jquery entwine
-		THIRDPARTY_DIR . '/jquery/jquery.js',
-		// JSON library
-		THIRDPARTY_DIR . '/json-js/json2.js',
+	Debug::show($this->getreserverString('this is my string!'));
+	$this->genreateJSON();
 
-		// Model
-		'mysite/javascript/thirdparty/underscore.js',
-		'mysite/javascript/thirdparty/backbone.js',
-		// Controller
-		THIRDPARTY_DIR . '/jquery-entwine/dist/jquery.entwine-dist.js',
-		// View
-		'mysite/javascript/thirdparty/showdown.js',
-
-		// Application
-		'mysite/javascript/models.js',
-		'mysite/javascript/application.js'
-		));
-
-
-
-
-
-
+	Requirements::customScript(self::get_config(), 'timeline_config');
+	
+	Requirements::set_write_js_to_body(false);
+	
 	}
 
+	//global configuration scripts
+	public function get_config(){
+
+	$json = $this->genreateJSON();
+	
+	return <<<JS
+	 var timeline_config = {
+					width: 	"100%",
+					height: "100%",
+					source: {$json},
+					css: 	'ss-timeline/css/timeline.css',	//OPTIONAL
+					js: 	'ss-timeline/js/timeline-min.js'	//OPTIONAL
+				}
+JS
+;
+	}
 
 
 	}

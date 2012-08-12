@@ -1,0 +1,27 @@
+	<style>
+			html, body {
+				height:100%;
+				padding: 0px;
+				margin: 0px;
+			}
+
+			#timeline-embed{
+				margin:0px !important;
+				border:0px solid #CCC !important;
+				padding:0px !important;
+				-webkit-border-radius:0px !important;
+				-moz-border-radius:0px !important;
+				border-radius:0px !important;
+				-moz-box-shadow:0 0px 0px rgba(0, 0, 0, 0.25) !important;
+				-webkit-box-shadow:0 0px 0px rgba(0, 0, 0, 0.25) !important;
+				box-shadow:0px 0px 0px rgba(0, 0, 0, 0.25) !important;
+			}
+		</style>
+
+<!-- output the timeline body text -->
+$Content		
+<div id="timeline-embed"></div>
+
+<script type="text/javascript" src="ss-timeline/js/timeline-embed.js"></script>
+
+<!-- END Timeline Embed -->

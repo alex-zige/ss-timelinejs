@@ -48,10 +48,20 @@ class TimePoint extends DataObject{
 
 		$imageField->allowedExtensions = array('jpg', 'gif', 'png');
 
+		//define the dropdown datepicker;
+		$start_date = new DateField('StartDate', 'Start Date');
+		$start_date->setconfig('showcalendar',true);
+		$start_date->setconfig('dateformat','mm,dd,yyyy');
+	
+
+		$end_date = new DateField('EndDate', 'End Date (optional)');
+		$end_date->setconfig('showcalendar',true);
+
+
 		return new FieldList(
 			new TextField('Headline', 'Headline'),
-			new DateField('StartDate', 'Start Date'),
-			new DateField('EndDate', 'End Date (optional)'),
+			$start_date,
+			$end_date,
 			new HTMLEditorField('Text', 'Content for the TimePoint'),
 			new TextField('MediaUrl', "Media Url"),
 			new TextField('MediaCredit', "Media Credit"),
@@ -61,6 +71,14 @@ class TimePoint extends DataObject{
 
 
 	}
+
+	//define the dateconvert from 2012-12-12 to 12,12,13
+	public function getNiceDate($date = null){
+
+	return ($date != null) ?  date("m,d,Y", strtotime($this->StartDate)) : null ; 
+
+	}
+
 } 
 	
 
