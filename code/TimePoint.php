@@ -22,7 +22,7 @@ class TimePoint extends DataObject{
 		'EndDate'=>'Date',
 		'Headline'=>'Varchar(255)',
 		'Text'=>'HTMLText',
-		'MediaUrl'=>'HTMLText',
+		'MediaUrl'=>'Text',
 		'MediaCredit'=>'Varchar(255)',
 		'MediaCaption'=>'Varchar(255)'
 	);
@@ -44,7 +44,7 @@ class TimePoint extends DataObject{
 	public function getCMSFields() {
 
 		//defien the image uploader and extension
-		$imageField = new UploadField('MeidaImage', 'Meida Image');
+		$imageField = new UploadField('MeidaImage', 'Meida Image (if you want upload your own image, it will overwrite your media url)');
 
 		$imageField->allowedExtensions = array('jpg', 'gif', 'png');
 
@@ -72,10 +72,10 @@ class TimePoint extends DataObject{
 
 	}
 
-	//define the dateconvert from 2012-12-12 to 12,12,13
+	//define the dateconvert from 2012-12-12 to 2012,12,12
 	public function getNiceDate($date = null){
 
-	return ($date != null) ?  date("m,d,Y", strtotime($this->StartDate)) : null ; 
+	return ($date != null) ?  date("Y,m,d", strtotime($this->StartDate)) : null ; 
 
 	}
 

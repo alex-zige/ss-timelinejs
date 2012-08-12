@@ -23,7 +23,13 @@ class TimelinePage extends Page {
 
 	public static $db = array(
 		'Headline'=>'Varchar(255)',
-		'Tagline'=>'Varchar(255)'
+		'Tagline'=>'Varchar(255)',
+		'Fonts'=>"enum('Bevan-PotanoSans,Merriweather-NewsCycle,PoiretOne-Molengo,
+						Arvo-PTSans,PTSerif-PTSans,PTSerif-PTSans,DroidSerif-DroidSans,Lekton-Molengo,NixieOne-Ledger,
+						AbrilFatface-Average,PlayfairDisplay-Muli,Rancho-Gudea,BreeSerif-OpenSans,SansitaOne-Kameron,
+						Pacifico-Arimo,PT','Bevan-PotanoSans')",
+
+
 	);
 
 	//define relationshiop with TimePoints
@@ -36,11 +42,13 @@ class TimelinePage extends Page {
 
 		$fields = parent::getCMSFields();
 
-
 		//the Global Headline
+		$fields->addFieldToTab("Root.Setting", new TextField('Tagline','Tagline'));
+		$fields->addFieldToTab("Root.Setting", new TextField('Headline','Timeline Headline'),'Tagline');
+		$fields->addFieldToTab("Root.Setting", new DropdownField('Fonts','Select a font family ',singleton('TimelinePage')->dbObject('Fonts')->enumValues()));
+		$fields->addFieldToTab("Root.Setting", new LiteralField('Fonts-Preview',"<a href=".Director::absoluteBaseURL()."ss-timeline/images/font-options.png target='_blank'>Preview the font combinations </a>",singleton('TimelinePage')->dbObject('Fonts')->enumValues()));
 
-		$fields->addFieldToTab("Root.Main", new TextField('Tagline','Tagline'),'Content');
-		$fields->addFieldToTab("Root.Main", new TextField('Headline','The Timeline Headline'),'Tagline');
+
 
 		// define the field config 
 		$gridFieldConfig = GridFieldConfig::create()->addComponents(
@@ -55,7 +63,6 @@ class TimelinePage extends Page {
             new GridFieldDetailForm()
 		);
 
-	//	Debug::show($this->TimePoints());
 	$gridField = new GridField("TimePoints", "Time Points", $this->TimePoints(), $gridFieldConfig);
 
 	$fields->addFieldToTab("Root.TimePoints", $gridField);
@@ -63,8 +70,6 @@ class TimelinePage extends Page {
 	return $fields;
 
 	}
-
-
 
 	/**
 	 * Generate json object based on the current timepoints
@@ -92,38 +97,7 @@ class TimelinePage extends Page {
 
 //	Debug::Show(json_encode($timeline_json_array));
 return json_encode($timeline_json_array);
-
-
-/*
-Final output that we want to have:
-
-{
-    "timeline":
-    {
-        "headline":"Sh*t People Say",
-        "type":"default",
-		"text":"People say stuff",
-        "date": [
-            <% loop TimePoints %>
-			{
-                "startDate":"2012,1,21",
-                "headline":"Sh*t Cyclists Say",
-                "text":"",
-                "asset":
-                {
-                    "media":"http://youtu.be/GMCkuqL9IcM",
-                    "credit":"",
-                    "caption":"Video script, production, and editing by Allen Krughoff of Hardcastle Photography"
-                }
-            },
-            <% end_loop %>
-      
-        ]
-    }
 }
-*/
-	}
-
 	public function getTimePointsArray($objectset){
 
 		//start parsing
@@ -137,11 +111,14 @@ Final output that we want to have:
 
 			foreach ($timepoints as $timepoint ) {
 
+				$media_url=$this->getMediaAsset($timepoint);
+
 				$asset=array(
-					"media" => $timepoint->MediaUrl,
+					"media" => $media_url,
                     "credit" => $timepoint->MediaCredit,
                     "caption" => $timepoint->MediaCaption
 					);
+
 
 				//date need to be conver to MM,DD,YY formate "12,30,2012",
 				$timepoint=array(
@@ -152,6 +129,7 @@ Final output that we want to have:
 					"asset"=> $asset,
 				 );
 
+				//test if it has images,render image as a default stuff.
 				array_push($date,$timepoint);
 			}
 
@@ -160,36 +138,19 @@ Final output that we want to have:
 
 	}
 
-	public function getAsset(){
+	public function getMediaAsset($timepoint){
 
+		if(isset($timepoint))
 
-	}
-
-	public function getreserverString($str=null){
-
-	if(is_string($str)){
-	
-	$tmp_str = $str;
-
-	//start split 
-	//split string to array
-	$tmp_str = str_split($tmp_str);
-
-	//reverse the the array;
-	$new_array = array_reverse($tmp_str);
-
-	//glu the array into a string for outputting
-	$new_str = implode('', $new_array);
-
-	return $new_str;
-
-	}
-
+		if($timepoint->MeidaImage()->ID != 0) { // if has mediaImage use the image instead, overwirte the media url.
+			return substr_replace(Director::absoluteBaseURL(),"/",-1).$timepoint->MeidaImage()->URL;
+ 		}else{
+			return $timepoint->MediaUrl;
+ 		}
 
 	}
 } 
 class TimelinePage_Controller extends Page_Controller{
-
 
 	public static $Timeline_Folder = 'ss-timeline';
 
@@ -197,11 +158,6 @@ class TimelinePage_Controller extends Page_Controller{
 	public function init(){
 
 		parent::init();
-
-		//Debug::show('sdas');
-
-	Debug::show($this->getreserverString('this is my string!'));
-	$this->genreateJSON();
 
 	Requirements::customScript(self::get_config(), 'timeline_config');
 	
@@ -213,19 +169,21 @@ class TimelinePage_Controller extends Page_Controller{
 	public function get_config(){
 
 	$json = $this->genreateJSON();
+
+	$font = trim($this->Fonts);
 	
 	return <<<JS
 	 var timeline_config = {
 					width: 	"100%",
 					height: "100%",
 					source: {$json},
+					font: "{$font}",
 					css: 	'ss-timeline/css/timeline.css',	//OPTIONAL
 					js: 	'ss-timeline/js/timeline-min.js'	//OPTIONAL
 				}
 JS
 ;
 	}
-
 
 	}
 
