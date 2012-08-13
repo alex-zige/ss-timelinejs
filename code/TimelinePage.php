@@ -28,7 +28,7 @@ class TimelinePage extends Page {
 						Arvo-PTSans,PTSerif-PTSans,PTSerif-PTSans,DroidSerif-DroidSans,Lekton-Molengo,NixieOne-Ledger,
 						AbrilFatface-Average,PlayfairDisplay-Muli,Rancho-Gudea,BreeSerif-OpenSans,SansitaOne-Kameron,
 						Pacifico-Arimo,PT','Bevan-PotanoSans')",
-
+		'Language'=>"enum('en,fr,es,de,it,pt-br,nl,cz,dk,id,pl,ru,is,fo,kr,ja,zh-ch,zh-tw,ta','en')"
 
 	);
 
@@ -42,12 +42,12 @@ class TimelinePage extends Page {
 
 		$fields = parent::getCMSFields();
 
-		//the Global Headline
+		//the Global setting
+		$fields->addFieldToTab("Root.Setting", new DropdownField('Language','Select timeline language',singleton('TimelinePage')->dbObject('Language')->enumValues()));
 		$fields->addFieldToTab("Root.Setting", new TextField('Tagline','Tagline'));
 		$fields->addFieldToTab("Root.Setting", new TextField('Headline','Timeline Headline'),'Tagline');
 		$fields->addFieldToTab("Root.Setting", new DropdownField('Fonts','Select a font family ',singleton('TimelinePage')->dbObject('Fonts')->enumValues()));
 		$fields->addFieldToTab("Root.Setting", new LiteralField('Fonts-Preview',"<a href=".Director::absoluteBaseURL()."ss-timeline/images/font-options.png target='_blank'>Preview the font combinations </a>",singleton('TimelinePage')->dbObject('Fonts')->enumValues()));
-
 
 
 		// define the field config 
@@ -171,6 +171,8 @@ class TimelinePage_Controller extends Page_Controller{
 	$json = $this->genreateJSON();
 
 	$font = trim($this->Fonts);
+
+	$lang = trim($this->Language);
 	
 	return <<<JS
 	 var timeline_config = {
@@ -178,6 +180,7 @@ class TimelinePage_Controller extends Page_Controller{
 					height: "100%",
 					source: {$json},
 					font: "{$font}",
+					lang: "{$lang}",
 					css: 	'ss-timeline/css/timeline.css',	//OPTIONAL
 					js: 	'ss-timeline/js/timeline-min.js'	//OPTIONAL
 				}
