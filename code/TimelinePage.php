@@ -36,6 +36,9 @@ class TimelinePage extends Page {
 
 	);
 
+	//set the default value as JSON
+    static $defaults = array('SourceType' => 'JSON');
+
 	//define relationshiop with TimePoints
 	static $has_many = array(
       'TimePoints' => 'TimePoint'
