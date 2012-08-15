@@ -173,7 +173,7 @@ class TimelinePage extends Page {
 		if(isset($timepoint))
 
 		if($timepoint->MeidaImage()->ID != 0) { // if has mediaImage use the image instead, overwirte the media url.
-			return substr_replace(Director::absoluteBaseURL(),"/",-1).$timepoint->MeidaImage()->URL;
+			return $timepoint->MeidaImage()->URL;
  		}else{
 			return $timepoint->MediaUrl;
  		}
