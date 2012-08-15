@@ -1,4 +1,6 @@
-	<style>
+<!-- start Timeline Embed -->
+
+		<style>
 			html, body {
 				height:100%;
 				padding: 0px;
@@ -19,7 +21,9 @@
 		</style>
 
 <!-- output the timeline body text -->
+
 $Content		
+
 <div id="timeline-embed"></div>
 
 <script type="text/javascript" src="ss-timeline/js/timeline-embed.js"></script>

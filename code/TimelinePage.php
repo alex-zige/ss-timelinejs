@@ -24,6 +24,10 @@ class TimelinePage extends Page {
 	public static $db = array(
 		'Headline'=>'Varchar(255)',
 		'Tagline'=>'Varchar(255)',
+		'Width'=>'Varchar(10)',
+		'Height'=>'Varchar(10)',
+		'SourceType'=>"enum('JSON,Google Docs','JSON')",
+		'GoogleDocSrc'=>'Varchar(255)',
 		'Fonts'=>"enum('Bevan-PotanoSans,Merriweather-NewsCycle,PoiretOne-Molengo,
 						Arvo-PTSans,PTSerif-PTSans,PTSerif-PTSans,DroidSerif-DroidSans,Lekton-Molengo,NixieOne-Ledger,
 						AbrilFatface-Average,PlayfairDisplay-Muli,Rancho-Gudea,BreeSerif-OpenSans,SansitaOne-Kameron,
@@ -48,9 +52,20 @@ class TimelinePage extends Page {
 		$fields->addFieldToTab("Root.Setting", new TextField('Headline','Timeline Headline'),'Tagline');
 		$fields->addFieldToTab("Root.Setting", new DropdownField('Fonts','Select a font family ',singleton('TimelinePage')->dbObject('Fonts')->enumValues()));
 		$fields->addFieldToTab("Root.Setting", new LiteralField('Fonts-Preview',"<a href=".Director::absoluteBaseURL()."ss-timeline/images/font-options.png target='_blank'>Preview the font combinations </a>",singleton('TimelinePage')->dbObject('Fonts')->enumValues()));
+		
+		//setting for width and height.
+		$fields->addFieldToTab("Root.Setting", new TextField('Width','Timeline Width (eg. 100% or 100, default: 940)'));
 
+		$fields->addFieldToTab("Root.Setting", new TextField('Height','Timeline Height (eg. 100% or 100, default: 400)'));
+	
+		$fields->addFieldToTab("Root.Setting", new DropdownField('SourceType','Please define the source type',singleton('TimelinePage')->dbObject('SourceType')->enumValues()));
 
 		// define the field config 
+
+		// if the soruce is JSON
+
+		if($this->SourceType == 'JSON'){
+
 		$gridFieldConfig = GridFieldConfig::create()->addComponents(
     		new GridFieldFilterHeader(),
             new GridFieldToolbarHeader(),
@@ -63,9 +78,15 @@ class TimelinePage extends Page {
             new GridFieldDetailForm()
 		);
 
-	$gridField = new GridField("TimePoints", "Time Points", $this->TimePoints(), $gridFieldConfig);
+		$gridField = new GridField("TimePoints", "Time Points", $this->TimePoints(), $gridFieldConfig);
 
-	$fields->addFieldToTab("Root.TimePoints", $gridField);
+		$fields->addFieldToTab("Root.TimePoints", $gridField);
+
+	}else{
+
+		$fields->addFieldToTab("Root.Setting", new TextField('GoogleDocSrc','Google Document Source URL'));
+
+	}
 
 	return $fields;
 
@@ -94,10 +115,10 @@ class TimelinePage extends Page {
 			)
 
 		);
+	
+	return json_encode($timeline_json_array);
+	}
 
-//	Debug::Show(json_encode($timeline_json_array));
-return json_encode($timeline_json_array);
-}
 	public function getTimePointsArray($objectset){
 
 		//start parsing
@@ -119,7 +140,6 @@ return json_encode($timeline_json_array);
                     "caption" => $timepoint->MediaCaption
 					);
 
-
 				//date need to be conver to MM,DD,YY formate "12,30,2012",
 				$timepoint=array(
 					'startDate' => $timepoint->getNiceDate($timepoint->StartDate),
@@ -138,6 +158,13 @@ return json_encode($timeline_json_array);
 
 	}
 
+
+	/**
+	 * Generate Meida Asset url, if the user upload own image, overwrite its media url.
+	 *
+	 * @return media url
+	 * @author alex
+	 **/
 	public function getMediaAsset($timepoint){
 
 		if(isset($timepoint))
@@ -150,9 +177,10 @@ return json_encode($timeline_json_array);
 
 	}
 } 
+
 class TimelinePage_Controller extends Page_Controller{
 
-	public static $Timeline_Folder = 'ss-timeline';
+	static $Timeline_Folder = 'ss-timeline';
 
 	//init function output the JS library and relevant CSS
 	public function init(){
@@ -165,20 +193,31 @@ class TimelinePage_Controller extends Page_Controller{
 	
 	}
 
-	//global configuration scripts
+	/**
+	 * Generate Configuration file for timeline
+	 *
+	 * @return javascript
+	 * @author alex
+	 **/
 	public function get_config(){
 
-	$json = $this->genreateJSON();
+	//define source type
+	$source = ($this->SourceType == "JSON" ) ? $this->genreateJSON() : $this->GoogleDocSrc;
 
 	$font = trim($this->Fonts);
 
 	$lang = trim($this->Language);
+
+	$width = ($this->Width) ? $this->Width : '940';
+
+	$height = ($this->Height) ? $this->Height : '400';
 	
+	//output javascript
 	return <<<JS
 	 var timeline_config = {
-					width: 	"100%",
-					height: "100%",
-					source: {$json},
+					width: 	"{$width}",
+					height: "{$height}",
+					source: {$source},
 					font: "{$font}",
 					lang: "{$lang}",
 					css: 	'ss-timeline/css/timeline.css',	//OPTIONAL

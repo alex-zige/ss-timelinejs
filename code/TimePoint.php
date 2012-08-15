@@ -38,8 +38,9 @@ class TimePoint extends DataObject{
 	public static $summary_fields = array(
        'Headline',
        'StartDate'
-
      );
+	
+
 	//define CMS fileds
 	public function getCMSFields() {
 
@@ -56,7 +57,7 @@ class TimePoint extends DataObject{
 
 		$end_date = new DateField('EndDate', 'End Date (optional)');
 		$end_date->setconfig('showcalendar',true);
-
+		$end_date->setconfig('dateformat','mm,dd,yyyy');
 
 		return new FieldList(
 			new TextField('Headline', 'Headline'),
